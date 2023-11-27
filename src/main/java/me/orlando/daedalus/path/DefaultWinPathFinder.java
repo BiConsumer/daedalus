@@ -1,8 +1,6 @@
 package me.orlando.daedalus.path;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class DefaultWinPathFinder implements WinPathFinder {
 
@@ -16,18 +14,18 @@ public class DefaultWinPathFinder implements WinPathFinder {
 
     @Override
     public Path find() throws Exception {
-        List<Path> bonked = new ArrayList<>();
+        Map<Path, PathResolver.Result> previous = new HashMap<>();
         PathResolver.Result result = PathResolver.Result.BONK;
         Path path = null;
 
         while (result != PathResolver.Result.WIN) {
-            path = chooser.choose(bonked);
+            path = chooser.choose(previous);
             System.out.println("chosen " + Arrays.toString(path.movements()));
             result = resolver.resolve(path);
 
             if (result != PathResolver.Result.WIN) {
                 System.out.println(Arrays.toString(path.movements()) + " NOT WIN");
-                bonked.add(path);
+                previous.put(path, result);
             }
         }
 

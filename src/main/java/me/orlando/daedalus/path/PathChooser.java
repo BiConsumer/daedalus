@@ -1,10 +1,9 @@
 package me.orlando.daedalus.path;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.util.Map;
 
 public interface PathChooser {
 
-    Path choose(Collection<Path> previous);
+    Path choose(Map<Path, PathResolver.Result> previous);
 
 }

@@ -6,11 +6,11 @@ import java.util.Arrays;
 
 public class DaedalusBootstrap {
 
-    private final static String BASE_URL = "https://ctf.ageei.org/daedalusv3105/move";
+    private final static String MOVE_URL = "https://ctf.ageei.org/daedalusv3105/move";
 
     public static void main(String[] args) throws Exception {
         PathChooser chooser = new IteratingPathChooser();
-        PathResolver resolver = new HttpPathResolver(BASE_URL);
+        PathResolver resolver = new HttpPathResolver(MOVE_URL);
         WinPathFinder pathFinder = new DefaultWinPathFinder(chooser, resolver);
 
         System.out.println("Finding path");
