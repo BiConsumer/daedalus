@@ -19,6 +19,8 @@ public class DefaultWinPathFinder implements WinPathFinder {
         Path path = null;
 
         while (result != PathResolver.Result.WIN) {
+            Thread.sleep(500);
+
             path = chooser.choose(previous);
             System.out.println("chosen " + Arrays.toString(path.movements()));
             result = resolver.resolve(path);
