@@ -38,4 +38,12 @@ public record Path(char[] movements) {
         return Vec2.fromPath(this);
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Path path)) {
+            return false;
+        }
+
+        return toVec().equals(path.toVec());
+    }
 }
