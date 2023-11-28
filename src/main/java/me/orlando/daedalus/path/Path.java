@@ -3,18 +3,15 @@ package me.orlando.daedalus.path;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public record Path(char[] movements) {
 
-    public Path(Character[] movements) {
-        this(Arrays.stream(movements)
-                .map(Object::toString)
-                .collect(Collectors.joining())
-                .toCharArray()
-        );
-    }
+    public final static char[] MOVEMENTS = {
+            'r',
+            'l',
+            'u',
+            'd'
+    };
 
     private final static Base64.Encoder ENCODER = Base64.getEncoder();
 
@@ -26,22 +23,28 @@ public record Path(char[] movements) {
         return String.valueOf(movements);
     }
 
-    public boolean matches(char[] path) {
-        return Arrays.equals(movements, path);
+    public Path append(char movement) {
+        char[] newMovements = new char[movements.length + 1];
+        System.arraycopy(movements, 0, newMovements, 0, movements.length);
+
+        newMovements[newMovements.length - 1] = movement;
+        return new Path(newMovements);
     }
 
-    public boolean matches(List<Character> path) {
-        if (path.size() != movements.length) {
-            return false;
+    public boolean isEmpty() {
+        return movements.length == 0;
+    }
+
+    public boolean matches(Path other) {
+        return Arrays.equals(movements, other.movements);
+    }
+
+    public char lastMove() {
+        if (isEmpty()) {
+            return ' ';
         }
 
-        for (int i = 0; i < movements.length; i++) {
-            if (path.get(i) != movements[i]) {
-                return false;
-            }
-        }
-
-        return true;
+        return movements[movements.length-1];
     }
 
 }

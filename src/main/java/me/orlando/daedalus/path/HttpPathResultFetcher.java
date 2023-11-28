@@ -5,27 +5,32 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-public class HttpPathResolver implements PathResolver {
+public class HttpPathResultFetcher implements PathResultFetcher {
 
     private final HttpClient client = HttpClient.newHttpClient();
-    private final String moveUrl;
+    private final URI moveUrl;
 
-    public HttpPathResolver(String moveUrl) {
-        this.moveUrl = moveUrl;
+    public HttpPathResultFetcher(String moveUrl) {
+        try {
+            this.moveUrl = new URI(moveUrl);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public Result resolve(Path path) throws Exception {
+    public Result fetch(Path path) {
         HttpRequest request = HttpRequest.newBuilder()
                 .header("Cookie", "path=" + path.encoded())
-                .uri(new URI(moveUrl))
+                .uri(moveUrl)
                 .build();
 
-        System.out.println("SENDING REQUEST");
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        System.out.println("RESPONSE!");
-        String body = response.body();
+        String body = null;
+        while (body == null) {
+            try {
+                body = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
+            } catch (Exception ignored) {}
+        }
 
         if (body.contains("BONK!")) {
             return Result.BONK;

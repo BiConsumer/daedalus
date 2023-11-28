@@ -1,8 +1,8 @@
 package me.orlando.daedalus.path;
 
-public interface PathResolver {
+public interface PathResultFetcher {
 
-    Result resolve(Path path) throws Exception;
+    Result fetch(Path path);
 
     enum Result {
         BONK,
