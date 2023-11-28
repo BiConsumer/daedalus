@@ -1,8 +1,11 @@
-package me.orlando.daedalus.path;
+package me.orlando.daedalus.solver;
+
+import me.orlando.daedalus.Path;
+import me.orlando.daedalus.result.PathResultFetcher;
 
 import java.util.*;
 
-import static me.orlando.daedalus.path.Path.MOVEMENTS;
+import static me.orlando.daedalus.Path.MOVEMENTS;
 
 public class DfsPathSolver implements PathSolver {
 

@@ -1,4 +1,4 @@
-package me.orlando.daedalus.path;
+package me.orlando.daedalus;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;

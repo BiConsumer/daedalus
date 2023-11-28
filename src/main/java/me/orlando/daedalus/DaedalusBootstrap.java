@@ -1,8 +1,9 @@
 package me.orlando.daedalus;
 
-import me.orlando.daedalus.path.*;
-
-import java.util.Arrays;
+import me.orlando.daedalus.result.HttpPathResultFetcher;
+import me.orlando.daedalus.solver.*;
+import me.orlando.daedalus.result.PathResultFetcher;
+import me.orlando.daedalus.solver.PathSolver;
 
 public class DaedalusBootstrap {
 

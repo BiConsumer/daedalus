@@ -1,4 +1,6 @@
-package me.orlando.daedalus.path;
+package me.orlando.daedalus.result;
+
+import me.orlando.daedalus.Path;
 
 import java.net.*;
 import java.net.http.HttpClient;
