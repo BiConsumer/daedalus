@@ -1,7 +1,6 @@
 package me.orlando.daedalus;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Base64;
 
 public record Path(char[] movements) {
@@ -35,16 +34,8 @@ public record Path(char[] movements) {
         return movements.length == 0;
     }
 
-    public boolean matches(Path other) {
-        return Arrays.equals(movements, other.movements);
-    }
-
-    public char lastMove() {
-        if (isEmpty()) {
-            return ' ';
-        }
-
-        return movements[movements.length-1];
+    public Vec2 toVec() {
+        return Vec2.fromPath(this);
     }
 
 }

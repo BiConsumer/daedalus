@@ -1,6 +1,7 @@
 package me.orlando.daedalus.solver;
 
 import me.orlando.daedalus.Path;
+import me.orlando.daedalus.Vec2;
 import me.orlando.daedalus.result.PathResultFetcher;
 
 import java.util.*;
@@ -10,9 +11,9 @@ import static me.orlando.daedalus.Path.MOVEMENTS;
 public class DfsPathSolver implements PathSolver {
 
     private final Deque<Path> stack = new ArrayDeque<>();
-    private final Set<Path> visited = new HashSet<>();
-    private final Set<Path> bonked = new HashSet<>();
-    private final Map<Path, PathResultFetcher.Result> resultMap = new HashMap<>();
+    private final Set<Vec2> visited = new HashSet<>();
+    private final Set<Vec2> bonked = new HashSet<>();
+    private final Map<Vec2, PathResultFetcher.Result> resultMap = new HashMap<>();
 
     private final PathResultFetcher resultFetcher;
 
@@ -29,24 +30,26 @@ public class DfsPathSolver implements PathSolver {
     }
 
     private Path solveDfs() throws Exception {
-        Optional<Path> path = Optional.ofNullable(stack.peekFirst());
+        Optional<Path> pathOptional = Optional.ofNullable(stack.peekFirst());
 
-        while (path.isPresent()) {
+        while (pathOptional.isPresent()) {
             PathResultFetcher.Result result = PathResultFetcher.Result.MOVING;
+            Path path = pathOptional.get();
+            Vec2 vec2 = Vec2.fromPath(path);
 
-            if (!path.get().isEmpty()) {
-                System.out.println(path.get().asString());
-                result = resultMap.computeIfAbsent(path.get(), resultFetcher::fetch);
+            if (!path.isEmpty()) {
+                System.out.println(path.asString());
+                result = resultMap.computeIfAbsent(vec2, ignore -> resultFetcher.fetch(path));
                 Thread.sleep(100);
             }
 
             if (result == PathResultFetcher.Result.WIN) {
-                return path.get();
+                return path;
             } else if (result == PathResultFetcher.Result.BONK) {
                 stack.pop();
-                bonked.add(path.get());
+                bonked.add(vec2);
             } else {
-                Optional<Path> next = path.map(this::nextTraversalAisle);
+                Optional<Path> next = pathOptional.map(this::nextTraversalAisle);
                 if (next.isPresent()) {
                     // Traverse next block
                     traverseNext(next.get());
@@ -56,14 +59,14 @@ public class DfsPathSolver implements PathSolver {
                 }
             }
 
-            path = Optional.ofNullable(stack.peekFirst());
+            pathOptional = Optional.ofNullable(stack.peekFirst());
         }
 
         return null;
     }
 
     private void traverseNext(Path next) {
-        this.visited.add(next);
+        this.visited.add(next.toVec());
         stack.push(next);
     }
 
@@ -72,7 +75,7 @@ public class DfsPathSolver implements PathSolver {
 
         for (char move : MOVEMENTS) {
             Path appended = path.append(move);
-            if (isValidAisle(appended) && !isReverse(path, move)) {
+            if (isValidAisle(appended)) {
                 next = appended;
                 break;
             }
@@ -85,26 +88,11 @@ public class DfsPathSolver implements PathSolver {
         return !isVisited(path) && !isBonked(path);
     }
 
-    private boolean isReverse(Path path, char move) {
-        char last = path.lastMove();
-        if (last == 'r' && move == 'l') {
-            return true;
-        } else if (last == 'l' && move == 'r') {
-            return true;
-        } else if (last == 'u' && move == 'd') {
-            return true;
-        } else if (last == 'd' && move == 'u') {
-            return true;
-        }
-
-        return false;
-    }
-
     private boolean isBonked(Path path) {
-        return bonked.stream().anyMatch(other -> other.matches(path));
+        return bonked.contains(path.toVec());
     }
 
     private boolean isVisited(Path path) {
-        return visited.stream().anyMatch(other -> other.matches(path));
+        return visited.contains(path.toVec());
     }
 }
