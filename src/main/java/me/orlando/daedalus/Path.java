@@ -34,8 +34,8 @@ public record Path(char[] movements) {
         return movements.length == 0;
     }
 
-    public Vec2 toVec() {
-        return Vec2.fromPath(this);
+    public Coordinate toCoordinate() {
+        return Coordinate.fromPath(this);
     }
 
     @Override
@@ -44,6 +44,6 @@ public record Path(char[] movements) {
             return false;
         }
 
-        return toVec().equals(path.toVec());
+        return toCoordinate().equals(path.toCoordinate());
     }
 }

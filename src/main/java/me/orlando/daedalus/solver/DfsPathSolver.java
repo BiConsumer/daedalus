@@ -1,7 +1,7 @@
 package me.orlando.daedalus.solver;
 
 import me.orlando.daedalus.Path;
-import me.orlando.daedalus.Vec2;
+import me.orlando.daedalus.Coordinate;
 import me.orlando.daedalus.result.PathResultFetcher;
 
 import java.util.*;
@@ -11,9 +11,9 @@ import static me.orlando.daedalus.Path.MOVEMENTS;
 public class DfsPathSolver implements PathSolver {
 
     private final Deque<Path> stack = new ArrayDeque<>();
-    private final Set<Vec2> visited = new HashSet<>();
-    private final Set<Vec2> bonked = new HashSet<>();
-    private final Map<Vec2, PathResultFetcher.Result> resultMap = new HashMap<>();
+    private final Set<Coordinate> visited = new HashSet<>();
+    private final Set<Coordinate> bonked = new HashSet<>();
+    private final Map<Coordinate, PathResultFetcher.Result> resultMap = new HashMap<>();
 
     private final PathResultFetcher resultFetcher;
 
@@ -35,11 +35,11 @@ public class DfsPathSolver implements PathSolver {
         while (pathOptional.isPresent()) {
             PathResultFetcher.Result result = PathResultFetcher.Result.MOVING;
             Path path = pathOptional.get();
-            Vec2 vec2 = path.toVec();
+            Coordinate coordinate = path.toCoordinate();
 
             if (!path.isEmpty()) {
                 System.out.println(path.asString());
-                result = resultMap.computeIfAbsent(vec2, ignore -> resultFetcher.fetch(path));
+                result = resultMap.computeIfAbsent(coordinate, ignore -> resultFetcher.fetch(path));
 //                Thread.sleep(10);
             }
 
@@ -47,7 +47,7 @@ public class DfsPathSolver implements PathSolver {
                 return path;
             } else if (result == PathResultFetcher.Result.BONK) {
                 stack.pop();
-                bonked.add(vec2);
+                bonked.add(coordinate);
             } else {
                 Optional<Path> next = pathOptional.map(this::nextTraversalAisle);
                 if (next.isPresent()) {
@@ -66,7 +66,7 @@ public class DfsPathSolver implements PathSolver {
     }
 
     private void traverseNext(Path next) {
-        this.visited.add(next.toVec());
+        this.visited.add(next.toCoordinate());
         stack.push(next);
     }
 
@@ -89,10 +89,10 @@ public class DfsPathSolver implements PathSolver {
     }
 
     private boolean isBonked(Path path) {
-        return bonked.contains(path.toVec());
+        return bonked.contains(path.toCoordinate());
     }
 
     private boolean isVisited(Path path) {
-        return visited.contains(path.toVec());
+        return visited.contains(path.toCoordinate());
     }
 }

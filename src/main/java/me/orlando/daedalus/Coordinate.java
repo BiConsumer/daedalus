@@ -1,8 +1,8 @@
 package me.orlando.daedalus;
 
-public record Vec2(int x, int y) {
+public record Coordinate(int x, int y) {
 
-    public static Vec2 fromPath(Path path) {
+    public static Coordinate fromPath(Path path) {
         int x = 0;
         int y = 0;
 
@@ -15,16 +15,16 @@ public record Vec2(int x, int y) {
             }
         }
 
-        return new Vec2(x, y);
+        return new Coordinate(x, y);
     }
 
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof Vec2 vec2)) {
+        if (!(other instanceof Coordinate coordinate)) {
             return false;
         }
 
-        return x == vec2.x
-                && y == vec2.y;
+        return x == coordinate.x
+                && y == coordinate.y;
     }
 }
