@@ -8,34 +8,35 @@ import java.util.*;
 
 import static me.orlando.daedalus.Path.MOVEMENTS;
 
-public class DfsPathSolver implements PathSolver {
+public class BfsPathSolver implements PathSolver {
 
-    private final Deque<Path> stack = new ArrayDeque<>();
+    private final Queue<Path> queue = new ArrayDeque<>();
     private final Set<Vec2> visited = new HashSet<>();
     private final Set<Vec2> bonked = new HashSet<>();
+
     private final Map<Vec2, PathResultFetcher.Result> resultMap = new HashMap<>();
 
     private final PathResultFetcher resultFetcher;
 
-    public DfsPathSolver(PathResultFetcher resultFetcher) {
+    public BfsPathSolver(PathResultFetcher resultFetcher) {
         this.resultFetcher = resultFetcher;
     }
 
     @Override
-    public Path solve() throws Exception {
+    public Path solve() throws InterruptedException {
         Path start = new Path(new char[0]);
-        traverseNext(start);
+        this.visited.add(start.toVec());
+        this.queue.offer(start);
 
-        return solveDfs();
+        return solveBfs();
     }
 
-    private Path solveDfs() throws Exception {
-        Optional<Path> pathOptional = Optional.ofNullable(stack.peekFirst());
-
+    private Path solveBfs() throws InterruptedException {
+        Optional<Path> pathOptional = Optional.ofNullable(queue.poll());
         while (pathOptional.isPresent()) {
-            PathResultFetcher.Result result = PathResultFetcher.Result.MOVING;
             Path path = pathOptional.get();
             Vec2 vec2 = path.toVec();
+            PathResultFetcher.Result result = PathResultFetcher.Result.MOVING;
 
             if (!path.isEmpty()) {
                 System.out.println(path.asString());
@@ -46,42 +47,28 @@ public class DfsPathSolver implements PathSolver {
             if (result == PathResultFetcher.Result.WIN) {
                 return path;
             } else if (result == PathResultFetcher.Result.BONK) {
-                stack.pop();
                 bonked.add(vec2);
+                pathOptional = Optional.ofNullable(queue.poll());
             } else {
-                Optional<Path> next = pathOptional.map(this::nextTraversalAisle);
-                if (next.isPresent()) {
-                    // Traverse next block
-                    traverseNext(next.get());
-                } else {
-                    // Dead end, backtrack and chose alternate path
-                    stack.pop();
-                }
+                process(path);
+                pathOptional = Optional.ofNullable(queue.poll());
             }
-
-            pathOptional = Optional.ofNullable(stack.peekFirst());
         }
 
         return null;
     }
 
-    private void traverseNext(Path next) {
-        this.visited.add(next.toVec());
-        stack.push(next);
+    private void process(Path path) {
+        for (char move : MOVEMENTS) {
+            addAisle(path.append(move));
+        }
     }
 
-    private Path nextTraversalAisle(Path path) {
-        Path next = null;
-
-        for (char move : MOVEMENTS) {
-            Path appended = path.append(move);
-            if (isValidAisle(appended)) {
-                next = appended;
-                break;
-            }
+    private void addAisle(Path path) {
+        if (isValidAisle(path)) {
+            this.queue.offer(path);
+            this.visited.add(path.toVec());
         }
-
-        return next;
     }
 
     private boolean isValidAisle(Path path) {
